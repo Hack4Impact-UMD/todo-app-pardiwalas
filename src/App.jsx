@@ -9,6 +9,7 @@ import {
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import TaskTable from "./components/TaskTable";
+import { preconnect } from "react-dom";
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -43,8 +44,23 @@ function App() {
     ELSE do nothing
   */
   const addTask = () => {
-    // START EDITING
-    // END EDITING
+    if (title.trim()) {
+      const newTask = {
+        id: uuidv4(),
+        title: title,
+        description: description,
+        completed: false,
+        dueDate: dueDate
+      };
+    
+     
+      setTasks((prevTasks) => [...prevTasks, newTask]);
+
+      setTitle("");
+      setDescription("");
+      setDueDate("");
+
+    }
   };
 
   /*
@@ -60,8 +76,10 @@ function App() {
     HINT HINT NUDGE NUDGE: I'm getting some Week 4 HW flashbacks...are you?
   */
   const toggleCompletion = (id) => {
-    // START EDITING
-    // END EDITING
+    
+    setTasks((prevTasks) => prevTasks.map((task) => task.id == id ? {...task, completed: !task.completed} : task));
+
+
   };
   
   /*
@@ -96,8 +114,10 @@ function App() {
     component to the result of calling calculateProgress.
   */
   const calculateProgress = () => {
-    // START EDITING
-    // END EDITING
+    if (tasks.length === 0) return 0; // Prevent divide by zero error
+
+    const completedTaskCount = tasks.filter((task) => task.completed).length;
+    return (completedTaskCount / tasks.length) * 100; // Convert to percentage
   };
 
   return (
@@ -116,16 +136,22 @@ function App() {
         <TextField
           required
           label="Title"
+          value = {title}
+          onChange={(e) => setTitle(e.target.value)}
         />
         <TextField
           label="Description"
+          value = {description}
+          onChange={(e) => setDescription(e.target.value)}
         />
         <TextField
           label="Due Date"
           type="date"
           InputLabelProps={{ shrink: true }}
+          value = {dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
         />
-        <Button variant="contained">
+        <Button variant="contained" onClick={addTask}>
           Add Task
         </Button>
       </div>
@@ -140,6 +166,7 @@ function App() {
       />
       <LinearProgress
         variant="determinate"
+        value = {calculateProgress()}
         sx={{ width: "100%", height: 10, borderRadius: 5, marginBottom: 2 }}
       />
       <TaskTable 
